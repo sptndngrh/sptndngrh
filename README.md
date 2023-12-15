@@ -24,8 +24,6 @@ I'm [Your Name], a passionate developer exploring the realms of code.
 <!-- Let's Connect -->
 ## 🌐 Let's Connect
 
-[![LinkedIn](https://img.shields.io/badge/-LinkedIn-blue?style=for-the-badge&logo=linkedin&logoColor=white)](Your-LinkedIn-Profile-Link)
-[![Twitter](https://img.shields.io/badge/-Twitter-blue?style=for-the-badge&logo=twitter&logoColor=white)](Your-Twitter-Profile-Link)
-
+[![LinkedIn](https://img.shields.io/badge/-LinkedIn-blue?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/septiandin/)
 <!-- Footer -->
 ###### Feel free to explore my repositories and reach out. Happy coding! 🚀
