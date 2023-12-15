@@ -9,13 +9,6 @@ I'm [Your Name], a passionate developer exploring the realms of code.
 - 🚀 Exploring the world of technology.
 - 🌱 Learning and growing every day.
 
-<!-- Technologies -->
-## 💻 Technologies
-
-[![Tech 1](https://img.shields.io/badge/-Tech1-blue)](Link-to-Tech1)
-[![Tech 2](https://img.shields.io/badge/-Tech2-orange)](Link-to-Tech2)
-[![Tech 3](https://img.shields.io/badge/-Tech3-green)](Link-to-Tech3)
-
 <!-- GitHub Stats -->
 ## 📊 GitHub Stats
 
