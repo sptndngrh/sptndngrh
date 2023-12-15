@@ -1,7 +1,7 @@
 <!-- Header -->
 # Hi there 👋
 
-I'm [Your Name], a passionate developer exploring the realms of code.
+I'm Septiandi Nugraha, a passionate developer exploring the realms of code.
 
 <!-- Introduction -->
 ## 🌟 About Me
