@@ -1,7 +1,7 @@
 <!-- Header -->
 
 <!-- Profile Views -->
-![Profile Views](https://komarev.com/ghpvc/?username=septiandin&style=flat-square&color=blueviolet)
+![Profile Views](https://img.shields.io/badge/dynamic/json?color=brightgreen&label=Profile%20Views&query=%24.views&url=https%3A%2F%2Fapi.countapi.xyz%2Fget%2Fhits%2Fyour-username%2Fgithub-profile)
 
 # Hi there 👋
 
