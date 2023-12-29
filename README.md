@@ -1,4 +1,8 @@
 <!-- Header -->
+
+<!-- Profile Views -->
+![Profile Views](https://komarev.com/ghpvc/?username=septiandin&style=flat-square&color=blueviolet)
+
 # Hi there 👋
 
 I'm Septiandi Nugraha, a passionate developer exploring the realms of code.
