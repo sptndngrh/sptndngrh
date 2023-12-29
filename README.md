@@ -1,7 +1,7 @@
 <!-- Header -->
 
 <!-- Profile Views -->
-![Profile Views](https://visitor-badge.glitch.me/badge?page_id=your-username.your-username)
+![Profile Views](https://api.visitorbadge.io/api/visitors?path=septiandin/github-profile&countColor=brightgreen&style=flat-square)
 
 # Hi there 👋
 
