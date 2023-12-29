@@ -1,7 +1,7 @@
 <!-- Header -->
 
 <!-- Profile Views -->
-![Profile Views](https://api.visitorbadge.io/api/visitors?path=septiandin/github-profile&countColor=brightgreen&style=flat-square)
+![Profile Views](https://img.shields.io/badge/dynamic/json?color=brightgreen&label=Profile%20Views&query=$.total&url=https://api.visitorbadge.io/api/visitors?path=septiandin/github-profile&style=flat-square)
 
 # Hi there 👋
 
