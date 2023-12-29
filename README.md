@@ -1,7 +1,7 @@
 <!-- Header -->
 
 <!-- Profile Views -->
-![Profile Views](https://img.shields.io/badge/dynamic/json?color=brightgreen&label=Profile%20Views&query=%24.views&url=https%3A%2F%2Fapi.countapi.xyz%2Fget%2Fhits%2Fyour-username%2Fgithub-profile)
+![Profile Views](https://visitor-badge.glitch.me/badge?page_id=your-username.your-username)
 
 # Hi there 👋
 
