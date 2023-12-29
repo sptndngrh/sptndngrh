@@ -9,11 +9,6 @@ I'm Septiandi Nugraha, a passionate developer exploring the realms of code.
 - 🚀 Exploring the world of technology.
 - 🌱 Learning and growing every day.
 
-<!-- GitHub Stats -->
-## 📊 GitHub Stats
-
-![Your GitHub Stats](https://github-readme-stats.vercel.app/api?username=sptndngrh&show_icons=true&theme=radical)
-
 <!-- Let's Connect -->
 ## 🌐 Let's Connect
 
