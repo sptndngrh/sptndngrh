@@ -2,7 +2,6 @@
 
 <!-- Profile Views -->
 ![Profile Views](https://komarev.com/ghpvc/?username=septiandin&style=flat-square&color=blueviolet&label=Profile+Views)
-![Profile Views](https://img.shields.io/badge/Profile%20Views-1000-brightgreen)
 
 # Hi there 👋
 
@@ -18,5 +17,7 @@ I'm Septiandi Nugraha, a passionate developer exploring the realms of code.
 ## 🌐 Let's Connect
 
 [![LinkedIn](https://img.shields.io/badge/-LinkedIn-blue?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/septiandin/)
+
 <!-- Footer -->
+###### ![Profile Grade](https://img.shields.io/badge/Profile%20Grade-B--lightgrey)
 ###### Feel free to explore my repositories and reach out. Happy coding! 🚀
