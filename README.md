@@ -2,6 +2,7 @@
 
 <!-- Profile Views -->
 ![Profile Views](https://komarev.com/ghpvc/?username=septiandin&style=flat-square&color=blueviolet&label=Profile+Views)
+![Profile Views](https://img.shields.io/badge/Profile%20Views-1000-brightgreen)
 
 # Hi there 👋
 
