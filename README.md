@@ -14,9 +14,8 @@ I'm Septiandi Nugraha, a passionate developer exploring the realms of code.
 - 🌱 Learning and growing every day.
 
 <!-- Let's Connect -->
-## 🌐 Let's Connect
-
-[![LinkedIn](https://img.shields.io/badge/-LinkedIn-blue?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/septiandin/)
+## 🌐 UI Portofolio
+https://dribbble.com/sptndngrh
 
 <!-- Footer -->
 ###### ![Profile Grade](https://img.shields.io/badge/Profile%20Grade-B--lightgrey)
