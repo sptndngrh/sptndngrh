@@ -15,6 +15,8 @@ I'm **Septiandi Nugraha**, a passionate developer exploring the realms of code.
 ## 📄 CV
 [![View My CV](https://img.shields.io/badge/View%20My%20CV-blueviolet?style=for-the-badge&logo=appveyor)](https://www.canva.com/design/DAGckldxcI4/l3nNIADytgE6sU0St_tHbg/view?utm_content=DAGckldxcI4&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h657840422e#2)
 
+## 📊 Profile Stats
+![GitHub Stats](https://github-readme-stats.vercel.app/api?username=septiandin&show_icons=true&count_private=true&hide=prs&theme=blueviolet)
+
 <!-- Footer -->
-![Profile Grade](https://img.shields.io/badge/Profile%20Grade-B--lightgrey)  
 Feel free to explore my repositories and reach out. Happy coding! 🚀
