@@ -17,21 +17,18 @@ I'm **Septiandi Nugraha**, a passionate developer exploring the realms of code.
 
 ## 📊 Profile Stats
 
-### 1. **GitHub Contributions**
-![GitHub Contributions](https://github-readme-streak-stats.herokuapp.com/?user=septiandin&theme=blueviolet)
-
-### 2. **GitHub Stats Summary**
-![GitHub Stats](https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=septiandin&theme=vue)
-
-### 3. **Top Languages**
-![Top Languages](https://github-readme-stats.vercel.app/api/top-langs/?username=septiandin&layout=compact&theme=blueviolet)
-
-### 4. **GitHub Repo Stats**
-![Repos Count](https://img.shields.io/badge/Repos%20Count-!%20blueviolet?style=flat&logo=github)
-
-### 5. **Followers & Following**
-![Followers Count](https://img.shields.io/badge/Followers-!%20blueviolet?style=flat&logo=github)
-![Following Count](https://img.shields.io/badge/Following-!%20blueviolet?style=flat&logo=github)
-
+<p align="center">
+<a href="https://github.com/sptndngrh">
+  <img height="225em" src="http://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=sptndngrh&theme=aura"/>
+</a><br/>
+<!-- <a href="https://github.com/sptndngrh">
+   <img height="225em" src="http://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=sptndngrh&theme=aura"/>
+   <img height="225em" src="http://github-profile-summary-cards.vercel.app/api/cards/most-commit-language?username=sptndngrh&theme=aura"/>
+</a><br/> -->
+<a href="https://github.com/sptndngrh">
+   <img height="225em" src="http://github-profile-summary-cards.vercel.app/api/cards/stats?username=sptndngrh&theme=aura"/>
+   <img height="225em" src="http://github-profile-summary-cards.vercel.app/api/cards/productive-time?username=sptndngrh&theme=aura&utcOffset=7"/>
+</a>
+</p>
 <!-- Footer -->
 Feel free to explore my repositories and reach out. Happy coding! 🚀
