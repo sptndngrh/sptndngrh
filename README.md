@@ -71,21 +71,16 @@ const septiandi = {
 
 ---
 
-<!-- GitHub Stats -->
 ## 📊 GitHub Stats
 
 <div align="center">
 
-<a href="https://github.com/sptndngrh">
-  <img height="220em" src="http://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=sptndngrh&theme=aura"/>
-</a>
+<img height="180em" src="https://github-readme-stats.vercel.app/api?username=sptndngrh&show_icons=true&theme=transparent&hide_border=true&title_color=a8b2d8&icon_color=a8b2d8&text_color=8892b0&bg_color=00000000&count_private=true" />
+<img height="180em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=sptndngrh&layout=compact&theme=transparent&hide_border=true&title_color=a8b2d8&text_color=8892b0&bg_color=00000000" />
 
 <br/>
 
-<a href="https://github.com/sptndngrh">
-  <img height="220em" src="http://github-profile-summary-cards.vercel.app/api/cards/stats?username=sptndngrh&theme=aura"/>
-  <img height="220em" src="http://github-profile-summary-cards.vercel.app/api/cards/productive-time?username=sptndngrh&theme=aura&utcOffset=7"/>
-</a>
+<img src="https://github-readme-streak-stats.herokuapp.com?user=sptndngrh&theme=transparent&hide_border=true&stroke=a8b2d8&ring=a8b2d8&fire=ccd6f6&currStreakNum=ccd6f6&sideNums=8892b0&currStreakLabel=a8b2d8&sideLabels=8892b0&dates=8892b0" />
 
 </div>
 
