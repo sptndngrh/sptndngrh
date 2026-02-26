@@ -176,9 +176,13 @@ Alterra Academy
 
 <div align="center">
 
-<img height="170em" src="https://github-readme-stats.vercel.app/api?username=sptndngrh&show_icons=true&theme=github_dark&hide_border=true&title_color=ccd6f6&icon_color=8892b0&text_color=8892b0&bg_color=0d1117&count_private=true&include_all_commits=true&card_width=420" />
-&nbsp;
-<img height="170em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=sptndngrh&layout=compact&theme=github_dark&hide_border=true&title_color=ccd6f6&text_color=8892b0&bg_color=0d1117&langs_count=6&card_width=320" />
+<!-- Streak Stats — hosted on streak-stats.demolab.com, very stable -->
+<img src="https://streak-stats.demolab.com?user=sptndngrh&theme=github-dark-blue&hide_border=true&date_format=j%20M%5B%20Y%5D&stroke=21262d&ring=8892b0&fire=ccd6f6&currStreakNum=ccd6f6&sideNums=8892b0&currStreakLabel=ccd6f6&sideLabels=8892b0&dates=8892b0&background=0d1117" width="60%" />
+
+<br/><br/>
+
+<!-- Profile Trophy — github-profile-trophy, stable & animated -->
+<img src="https://github-profile-trophy.vercel.app/?username=sptndngrh&theme=darkhub&no-frame=true&no-bg=true&margin-w=6&column=6&rank=SECRET,SSS,SS,S,AAA,AA,A,B" width="95%" />
 
 </div>
 
