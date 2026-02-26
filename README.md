@@ -190,131 +190,29 @@ Alterra Academy
 
 <div align="center">
 
-<svg width="720" height="380" viewBox="0 0 720 380" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <style>
-      .title { font: 600 13px 'JetBrains Mono', monospace; fill: #ccd6f6; }
-      .label { font: 500 12px 'JetBrains Mono', monospace; fill: #8892b0; }
-      .pct   { font: 600 11px 'JetBrains Mono', monospace; fill: #ccd6f6; }
-      .track { fill: #161b22; rx: 6; }
+### ⚙️ Backend
 
-      @keyframes grow-1  { from { width: 0 } to { width: 252px } }
-      @keyframes grow-2  { from { width: 0 } to { width: 234px } }
-      @keyframes grow-3  { from { width: 0 } to { width: 220px } }
-      @keyframes grow-4  { from { width: 0 } to { width: 198px } }
-      @keyframes grow-5  { from { width: 0 } to { width: 180px } }
-      @keyframes grow-6  { from { width: 0 } to { width: 252px } }
-      @keyframes grow-7  { from { width: 0 } to { width: 216px } }
-      @keyframes grow-8  { from { width: 0 } to { width: 198px } }
-      @keyframes grow-9  { from { width: 0 } to { width: 270px } }
-      @keyframes grow-10 { from { width: 0 } to { width: 243px } }
+| Skill | Proficiency |
+|:---|:---|
+| PHP / Laravel | `████████████████████░░░` 90% |
+| Golang | `██████████████████░░░░░` 83% |
+| Node.js | `█████████████████░░░░░░` 78% |
+| RESTful API Design | `███████████████░░░░░░░░` 70% |
+| OutSystems | `██████████████░░░░░░░░░` 64% |
 
-      .b1  { animation: grow-1  1.2s 0.1s cubic-bezier(.4,0,.2,1) both; }
-      .b2  { animation: grow-2  1.2s 0.2s cubic-bezier(.4,0,.2,1) both; }
-      .b3  { animation: grow-3  1.2s 0.3s cubic-bezier(.4,0,.2,1) both; }
-      .b4  { animation: grow-4  1.2s 0.4s cubic-bezier(.4,0,.2,1) both; }
-      .b5  { animation: grow-5  1.2s 0.5s cubic-bezier(.4,0,.2,1) both; }
-      .b6  { animation: grow-6  1.2s 0.2s cubic-bezier(.4,0,.2,1) both; }
-      .b7  { animation: grow-7  1.2s 0.3s cubic-bezier(.4,0,.2,1) both; }
-      .b8  { animation: grow-8  1.2s 0.4s cubic-bezier(.4,0,.2,1) both; }
-      .b9  { animation: grow-9  1.2s 0.1s cubic-bezier(.4,0,.2,1) both; }
-      .b10 { animation: grow-10 1.2s 0.2s cubic-bezier(.4,0,.2,1) both; }
-    </style>
-    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#8892b0"/>
-      <stop offset="100%" style="stop-color:#ccd6f6"/>
-    </linearGradient>
-    <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#6e7fa3"/>
-      <stop offset="100%" style="stop-color:#a8b2d8"/>
-    </linearGradient>
-  </defs>
+### 🖥️ Frontend & Tools
 
-  <!-- Background -->
-  <rect width="720" height="380" rx="12" fill="#0d1117"/>
-  <rect x="1" y="1" width="718" height="378" rx="11" fill="none" stroke="#21262d" stroke-width="1"/>
+| Skill | Proficiency |
+|:---|:---|
+| Git / GitHub | `█████████████████████░░` 96% |
+| HTML / CSS / JavaScript | `████████████████████░░░` 90% |
+| Figma / UI Design | `███████████████████░░░░` 86% |
+| MySQL | `█████████████████░░░░░░` 77% |
+| Postman / API Testing | `███████████████░░░░░░░░` 70% |
 
-  <!-- LEFT COLUMN — Backend -->
-  <text x="36" y="38" class="title">⚙ Backend</text>
-  <line x1="36" y1="46" x2="320" y2="46" stroke="#21262d" stroke-width="1"/>
+### 🧰 Additional Skills
 
-  <!-- PHP / Laravel -->
-  <text x="36" y="76" class="label">PHP / Laravel</text>
-  <rect x="36" y="84" width="280" height="10" rx="5" fill="#161b22"/>
-  <rect x="36" y="84" width="1" height="10" rx="5" fill="url(#g1)" class="b1"/>
-  <text x="326" y="94" class="pct">90%</text>
-
-  <!-- Golang -->
-  <text x="36" y="118" class="label">Golang</text>
-  <rect x="36" y="126" width="280" height="10" rx="5" fill="#161b22"/>
-  <rect x="36" y="126" width="1" height="10" rx="5" fill="url(#g1)" class="b2"/>
-  <text x="326" y="136" class="pct">83%</text>
-
-  <!-- Node.js -->
-  <text x="36" y="160" class="label">Node.js</text>
-  <rect x="36" y="168" width="280" height="10" rx="5" fill="#161b22"/>
-  <rect x="36" y="168" width="1" height="10" rx="5" fill="url(#g1)" class="b3"/>
-  <text x="326" y="178" class="pct">78%</text>
-
-  <!-- RESTful API -->
-  <text x="36" y="202" class="label">RESTful API</text>
-  <rect x="36" y="210" width="280" height="10" rx="5" fill="#161b22"/>
-  <rect x="36" y="210" width="1" height="10" rx="5" fill="url(#g1)" class="b4"/>
-  <text x="326" y="220" class="pct">70%</text>
-
-  <!-- OutSystems -->
-  <text x="36" y="244" class="label">OutSystems</text>
-  <rect x="36" y="252" width="280" height="10" rx="5" fill="#161b22"/>
-  <rect x="36" y="252" width="1" height="10" rx="5" fill="url(#g1)" class="b5"/>
-  <text x="326" y="262" class="pct">64%</text>
-
-  <!-- Divider -->
-  <line x1="368" y1="24" x2="368" y2="356" stroke="#21262d" stroke-width="1"/>
-
-  <!-- RIGHT COLUMN — Frontend & Tools -->
-  <text x="396" y="38" class="title">◈ Frontend &amp; Tools</text>
-  <line x1="396" y1="46" x2="688" y2="46" stroke="#21262d" stroke-width="1"/>
-
-  <!-- HTML / CSS / JS -->
-  <text x="396" y="76" class="label">HTML / CSS / JS</text>
-  <rect x="396" y="84" width="280" height="10" rx="5" fill="#161b22"/>
-  <rect x="396" y="84" width="1" height="10" rx="5" fill="url(#g2)" class="b6"/>
-  <text x="686" y="94" class="pct" text-anchor="end">90%</text>
-
-  <!-- MySQL -->
-  <text x="396" y="118" class="label">MySQL</text>
-  <rect x="396" y="126" width="280" height="10" rx="5" fill="#161b22"/>
-  <rect x="396" y="126" width="1" height="10" rx="5" fill="url(#g2)" class="b7"/>
-  <text x="686" y="136" class="pct" text-anchor="end">77%</text>
-
-  <!-- Postman -->
-  <text x="396" y="160" class="label">Postman / API Testing</text>
-  <rect x="396" y="168" width="280" height="10" rx="5" fill="#161b22"/>
-  <rect x="396" y="168" width="1" height="10" rx="5" fill="url(#g2)" class="b8"/>
-  <text x="686" y="178" class="pct" text-anchor="end">70%</text>
-
-  <!-- Git / GitHub -->
-  <text x="396" y="202" class="label">Git / GitHub</text>
-  <rect x="396" y="210" width="280" height="10" rx="5" fill="#161b22"/>
-  <rect x="396" y="210" width="1" height="10" rx="5" fill="url(#g2)" class="b9"/>
-  <text x="686" y="220" class="pct" text-anchor="end">96%</text>
-
-  <!-- Figma -->
-  <text x="396" y="244" class="label">Figma / UI Design</text>
-  <rect x="396" y="252" width="280" height="10" rx="5" fill="#161b22"/>
-  <rect x="396" y="252" width="1" height="10" rx="5" fill="url(#g2)" class="b10"/>
-  <text x="686" y="262" class="pct" text-anchor="end">86%</text>
-
-  <!-- Bottom divider -->
-  <line x1="36" y1="290" x2="688" y2="290" stroke="#21262d" stroke-width="1"/>
-
-  <!-- Legend row -->
-  <text x="36" y="316" class="label">🎓  GPA 3.91 / 4.00</text>
-  <text x="220" y="316" class="label">📍  Cirebon, Indonesia</text>
-  <text x="430" y="316" class="label">💼  Open to Opportunities</text>
-
-  <text x="36" y="348" class="label">🛠  ERD Design  ·  System Flow  ·  Agile / Scrum  ·  Unit Testing  ·  QA</text>
-</svg>
+`ERD Design` &nbsp;·&nbsp; `System Architecture` &nbsp;·&nbsp; `Agile / Scrum` &nbsp;·&nbsp; `Unit Testing` &nbsp;·&nbsp; `Quality Assurance`
 
 </div>
 
