@@ -162,6 +162,8 @@ Alterra Academy
 
 <br/>
 
+![OutSystems Cert](https://img.shields.io/badge/Software%20Engineer%20Intern-Certificate%20Completion%20%28OutSystems%29%202026-FF0000?style=flat-square&logo=outsystems&logoColor=white)
+&nbsp;
 ![Alterra Golang](https://img.shields.io/badge/Alterra%20Academy-Backend%20Golang%20Certificate-00ADD8?style=flat-square&logo=go&logoColor=white)
 &nbsp;
 ![MSIB Batch 5](https://img.shields.io/badge/MSIB%20Batch%205-Alterra%20Academy%20Graduate-FF6A00?style=flat-square&logo=bookstack&logoColor=white)
