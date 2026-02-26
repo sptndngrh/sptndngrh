@@ -172,6 +172,27 @@ Alterra Academy
 
 ---
 
+## 📊 GitHub Stats
+
+<div align="center">
+
+<a href="https://github.com/sptndngrh">
+  <img height="180em" src="https://github-readme-stats.vercel.app/api?username=sptndngrh&show_icons=true&theme=github_dark&hide_border=true&bg_color=0d1117&title_color=ccd6f6&icon_color=8892b0&text_color=8892b0&ring_color=ccd6f6&include_all_commits=true&count_private=true" />
+</a>
+<a href="https://github.com/sptndngrh">
+  <img height="180em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=sptndngrh&layout=compact&theme=github_dark&hide_border=true&bg_color=0d1117&title_color=ccd6f6&text_color=8892b0&langs_count=8" />
+</a>
+
+<br/><br/>
+
+<a href="https://git.io/streak-stats">
+  <img src="https://streak-stats.demolab.com?user=sptndngrh&theme=github-dark-blue&hide_border=true&background=0d1117&ring=ccd6f6&fire=ccd6f6&currStreakLabel=ccd6f6&sideLabels=8892b0&dates=8892b0&currStreakNum=ccd6f6&sideNums=ccd6f6" />
+</a>
+
+</div>
+
+---
+
 ## 📊 Skill Proficiency
 
 <div align="center">
