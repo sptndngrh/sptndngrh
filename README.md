@@ -26,7 +26,7 @@
 const septiandi = {
   name       : "Septiandi Nugraha",
   location   : "Cirebon, Indonesia",
-  education  : "S.T. Software Engineering — Telkom University (GPA: 3.91/4.00)",
+  education  : "S.Kom. Software Engineering — Telkom University (GPA: 3.91/4.00)",
   role       : "Fullstack-oriented Software Engineer",
   focus      : ["Backend Development", "API Design", "System Architecture"],
   currentJob : "OutSystems Developer Backend Intern @ PT. Perkasa Pilar Utama",
