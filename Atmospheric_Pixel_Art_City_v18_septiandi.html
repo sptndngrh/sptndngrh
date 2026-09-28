@@ -38,14 +38,100 @@
             image-rendering: pixelated;
         }
 
+        /* ---- Responsive: teks keterangan ikut mengecil mengikuti lebar layar ---- */
+        #canvas-container { container-type: inline-size; }
+
         #ui-overlay {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: clamp(4px, 1.6cqw, 10px);
+            left: clamp(4px, 1.6cqw, 10px);
+            max-width: calc(100cqw - 2 * clamp(4px, 1.6cqw, 10px));
             color: rgba(255, 255, 255, 0.6);
-            font-size: 14px;
+            font-size: clamp(7px, 2.1cqw, 14px);   /* HP ~390px => ~8px, desktop => 14px */
+            line-height: 1.25;
             pointer-events: none;
             text-shadow: 1px 1px 0px #000;
+        }
+        #ui-overlay .hint {
+            margin-top: 0.45em;
+            font-size: 0.79em;   /* setara 11px saat font utama 14px */
+            opacity: .4;
+        }
+
+        /* ---- Tombol kontrol sentuh (hanya muncul di HP / layar sentuh tanpa keyboard) ---- */
+        #touch-controls { display: none; }
+
+        @media (hover: none) and (pointer: coarse) {
+            #ui-overlay .hint { display: none; }   /* petunjuk [K] [H] dst. diganti tombol yang bisa diklik */
+
+            body { flex-direction: column; }
+            #canvas-container { flex: 0 0 auto; }
+
+            #touch-controls {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+                padding: 12px 10px;
+                box-sizing: border-box;
+                width: 100%;
+                -webkit-user-select: none;
+                user-select: none;
+            }
+            #touch-controls button {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                min-height: 44px;                 /* ukuran minimal target sentuh */
+                padding: 0 14px 0 8px;
+                font: 600 13px/1 monospace;
+                color: #dfe6f5;
+                background: #10131c;
+                border: 1px solid rgba(255, 255, 255, 0.28);
+                border-radius: 10px;
+                touch-action: manipulation;       /* tanpa delay / zoom dobel-tap */
+                -webkit-tap-highlight-color: transparent;
+                cursor: pointer;
+            }
+            #touch-controls button b {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 28px;
+                height: 28px;
+                border-radius: 6px;
+                background: rgba(255, 255, 255, 0.14);
+                color: #fff;
+                font-size: 15px;
+            }
+            #touch-controls button:active {
+                background: #26304a;
+                transform: scale(0.96);
+            }
+
+            /* HP posisi landscape: kontrol pindah ke kolom kanan agar kanvas tidak terpotong */
+            @media (orientation: landscape) {
+                body { flex-direction: row; }
+                #canvas-container {
+                    width: min(calc(100vw - 104px), calc(100vh * 16 / 9));
+                    width: min(calc(100vw - 104px), calc(100dvh * 16 / 9));
+                }
+                #touch-controls {
+                    flex-direction: column;
+                    flex-wrap: nowrap;
+                    justify-content: center;
+                    width: 104px;
+                    padding: 6px;
+                    gap: 5px;
+                }
+                #touch-controls button {
+                    min-height: 38px;
+                    padding: 0 6px 0 4px;
+                    gap: 6px;
+                    font-size: 11px;
+                }
+                #touch-controls button b { width: 24px; height: 24px; font-size: 13px; }
+            }
         }
     </style>
 </head>
@@ -59,8 +145,18 @@
             <div>Season: <span id="season-text">Hujan</span></div>
             <div>Air: <span id="air-text">30 · Baik</span></div>
             <div>Banjir: <span id="flood-text">Kering</span></div>
-            <div style="margin-top:6px;font-size:11px;opacity:.4">[K] Kemarau (tekan lagi = maju) · [H] Hujan · [B] Badai Besar · [G] Gempa · [F] Karhutla · badai → banjir · [P] Pesawat</div>
+            <div class="hint">[K] Kemarau (tekan lagi = maju) · [H] Hujan · [B] Badai Besar · [G] Gempa · [F] Karhutla · badai → banjir · [P] Pesawat</div>
         </div>
+    </div>
+
+    <!-- Kontrol sentuh: hanya tampil di HP (tanpa keyboard). Tiap tombol mewakili satu huruf pintasan. -->
+    <div id="touch-controls" role="group" aria-label="Kontrol kondisi">
+        <button type="button" data-key="k"><b>K</b>Kemarau</button>
+        <button type="button" data-key="h"><b>H</b>Hujan</button>
+        <button type="button" data-key="b"><b>B</b>Badai</button>
+        <button type="button" data-key="g"><b>G</b>Gempa</button>
+        <button type="button" data-key="f"><b>F</b>Karhutla</button>
+        <button type="button" data-key="p"><b>P</b>Pesawat</button>
     </div>
 
     <script>
@@ -2811,6 +2907,13 @@
         V15.seed();
 
         requestAnimationFrame(gameLoop);
+
+        // Kontrol sentuh: klik tombol = menekan huruf pintasan yang sama di keyboard
+        document.querySelectorAll('#touch-controls button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                window.dispatchEvent(new KeyboardEvent('keydown', { key: btn.dataset.key }));
+            });
+        });
     </script>
 </body>
 </html>
