@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atmospheric Pixel Art City v18</title>
+    <title>Atmospheric Pixel Art City v19 - Gunung Meletus</title>
     <style>
         body, html {
             margin: 0;
@@ -145,7 +145,8 @@
             <div>Season: <span id="season-text">Hujan</span></div>
             <div>Air: <span id="air-text">30 · Baik</span></div>
             <div>Banjir: <span id="flood-text">Kering</span></div>
-            <div class="hint">[K] Kemarau (tekan lagi = maju) · [H] Hujan · [B] Badai Besar · [G] Gempa · [F] Karhutla · badai → banjir · [P] Pesawat</div>
+            <div>Gunung: <span id="volcano-text">Tenang</span></div>
+            <div class="hint">[K] Kemarau (tekan lagi = maju) · [H] Hujan · [B] Badai Besar · [G] Gempa · [F] Karhutla · [V] Gunung Meletus · badai → banjir · [P] Pesawat</div>
         </div>
     </div>
 
@@ -156,6 +157,7 @@
         <button type="button" data-key="b"><b>B</b>Badai</button>
         <button type="button" data-key="g"><b>G</b>Gempa</button>
         <button type="button" data-key="f"><b>F</b>Karhutla</button>
+        <button type="button" data-key="v"><b>V</b>Meletus</button>
         <button type="button" data-key="p"><b>P</b>Pesawat</button>
     </div>
 
@@ -178,6 +180,7 @@
         const seasonText = document.getElementById('season-text'), airText = document.getElementById('air-text');
         const floodTextEl = document.getElementById('flood-text'); let lastFloodTxt = '';
         let lastSeason = '', lastAqi = -1;
+        const volcanoTextEl = document.getElementById('volcano-text'); let lastVolTxt = '';
 
         // Global State & Physics
         let time = 0;
@@ -192,7 +195,10 @@
         let quake = 0, quakeT = -1, quakeDust = 0; // earthquake: quake 0..1 = current shaking strength, quakeT = frames since it began (-1 = none), dust = haze it kicks up
         const QUAKE_DUR = 780; // ~13 s: faint P-wave tremor, sudden strong shaking, then it dies away
         let karhutlaOn = false, karhutla = 0; // forest / land fires (karhutla): thick orange-red smoke haze, AQI climbing toward 1000; needs the dry season
-        let bigStormOn = false, bigStorm = 0; // manual big storm (button / [B]); bigStorm 0..1 = how fully it has arrived (drives building sway)
+        // v19: gunung meletus (Fuji). eruptT = frame sejak letusan dimulai (-1 = tidak aktif); semua faktor di bawah 0..1 dan bergerak halus menuju targetnya
+let eruptT = -1, eruptBlast = false;
+let vMelt = 0, vLava = 0, vPlume = 0, skyOrange = 0, skyBlack = 0, ashRain = 0, ashCover = 0, volHaze = 0, volGlow = 0, smokeK = 0; // salju hilang, lava, asap erupsi, langit oranye, langit hitam, hujan abu, abu di tanah, kabut abu, kilatan ledakan, asap gabungan (karhutla + abu)
+let bigStormOn = false, bigStorm = 0; // manual big storm (button / [B]); bigStorm 0..1 = how fully it has arrived (drives building sway)
         let boltPoints = null, boltBranch = null; // jagged lightning bolt path
         let powerOn = true; // City-wide power state — flips off when the storm knocks out the grid
         let stormBuildup = 0; // 0..1 — rises only while the sky is actively thickening ahead of rain/a storm
@@ -573,7 +579,7 @@
                         else if (gap < 38) desiredSpeed = c.baseSpeed * 0.85;  // comfortable following gap
                     }
                 }
-                desiredSpeed *= (1 - quake * 0.85) * (1 - karhutla * 0.2); // brakes when the ground shakes, and eases off in thick smoke
+                desiredSpeed *= (1 - quake * 0.85) * (1 - karhutla * 0.2) * (1 - ashRain * 0.35); // brakes when the ground shakes, and eases off in thick smoke
                 desiredSpeed *= 1 - ss(0.28, 0.75, flood) * 0.5;   // wades slowly through standing water
                 c.stall = c.active && flood > 0.7 && c.stallK < (flood - 0.7) * 2.4; // in deep water some engines drown and the car is stuck
                 if (c.stall) desiredSpeed = 0;
@@ -912,6 +918,91 @@
             if (season !== 1) startSeason(1); // fires only happen in the dry season
             karhutlaOn = true; weatherState = 0; targetWeatherTransition = 0; targetWindSpeed = 0.4 + Math.random() * 1.2; weatherTimer = 1500 + Math.random() * 2500;
         }
+        // ---- v19: Gunung meletus ---------------------------------------------------------------------
+        // Alur (frame @60/s): 0 tremor + gempa -> 150 salju tiba-tiba hilang -> 200 lava menyala -> 330 ledakan + asap erupsi + gempa susulan
+        // -> 600 petir vulkanik -> 800 langit bertahap oranye -> 2000 lalu hitam pekat seperti malam (lampu kota menyala) -> 2800 hujan abu
+        // -> 5600 abu reda, hujan air deras + angin kencang (banjir mengikuti logika hujan biasa) -> 8800 mereda -> 9000 selesai.
+        // Semua kondisi memakai sistem yang sudah ada: gempa, petir, hujan, angin, banjir, lampu jalan/jendela, AQI, kabut, listrik padam.
+        function toggleVolcano() {
+            if (eruptT < 0) { eruptT = 0; eruptBlast = false; triggerQuake(); }
+            else if (eruptT < 5600) eruptT = 5600;            // tekan lagi: lompat ke hujan air
+            else eruptT = Math.max(eruptT, 8800);             // tekan lagi: akhiri
+        }
+        function volcanoBolt() { // petir vulkanik: menyambar di dalam kolom asap, turun ke kawah
+            const cx = V15.FJ.cx, ty = V15.craterY() - 4, n = 8, dy = (ty - 8) / n;
+            let x = cx + (Math.random() - 0.5) * 110, y = 8; boltPoints = [{ x, y }];
+            for (let i = 0; i < n; i++) { x += (Math.random() - 0.5) * 26 + (cx - x) * 0.08; y += dy; boltPoints.push({ x, y }); }
+            const bf = 2 + ((Math.random() * 3) | 0), s = Math.random() < 0.5 ? -1 : 1;
+            let bx = boltPoints[bf].x, by = boltPoints[bf].y; boltBranch = [{ x: bx, y: by }];
+            for (let i = 0; i < 4; i++) { bx += s * (8 + Math.random() * 14); by += 12; boltBranch.push({ x: bx, y: by }); }
+            lightningFlash = 0.85;
+        }
+        const VASH = Array.from({ length: 520 }, () => ({ x: Math.random() * width, y: Math.random() * height, vy: 0.8 + Math.random() * 1.6, ph: Math.random() * 6.283, big: Math.random() < 0.22 }));
+        function updateVolAsh() {
+            if (ashRain < 0.03) return;
+            const n = (ashRain * VASH.length) | 0, wd = 0.5 + Math.min(windSpeed, 30) * 0.14;
+            for (let i = 0; i < n; i++) {
+                const a = VASH[i];
+                a.y += a.vy * (a.big ? 1.25 : 1) * dt; a.x += (wd + Math.sin(time * 0.03 + a.ph) * 0.3) * dt;
+                if (a.y > height) { a.y = -2; a.x = Math.random() * width; }
+                if (a.x > width) a.x -= width;
+            }
+        }
+        function drawVolAsh() { // hujan abu: serpihan abu abu-kecoklatan jatuh deras, terbawa angin
+            if (ashRain < 0.03) return;
+            const n = (ashRain * VASH.length) | 0, k = Math.min(1, ashRain * 1.4), c = (150 + 70 * Math.min(1, dayAmt * 1.5)) | 0;
+            ctx.fillStyle = `rgba(${c}, ${c - 10}, ${c - 20}, ${0.62 * k})`; ctx.beginPath();
+            for (let i = 0; i < n; i++) if (!VASH[i].big) ctx.rect(VASH[i].x | 0, VASH[i].y | 0, 1, 1);
+            ctx.fill();
+            ctx.fillStyle = `rgba(${c + 25}, ${c + 12}, ${c}, ${0.5 * k})`; ctx.beginPath();
+            for (let i = 0; i < n; i++) if (VASH[i].big) ctx.rect(VASH[i].x | 0, VASH[i].y | 0, 2, 2);
+            ctx.fill();
+        }
+        function updateEruption() {
+            const on = eruptT >= 0;
+            if (on) {
+                eruptT += dt; const t = eruptT;
+                bigStormOn = false; karhutlaOn = false;
+                seasonElapsed = Math.min(seasonElapsed, seasonLen - 300); // musim tidak berganti di tengah letusan
+                if (t < 5600) { // sebelum hujan air: langit tidak boleh hujan, angin tenang
+                    weatherState = 0; targetWeatherTransition = 0; targetWindSpeed = t < 2000 ? 1.5 : 3.5; weatherTimer = Math.max(weatherTimer, 400);
+                } else if (t < 8800) { // abu reda -> hujan air deras + angin kencang (banjir & petir ikut logika badai yang sudah ada)
+                    if (season === 1) startSeason(0);
+                    firstRain = false; weatherState = 2;
+                    targetWeatherTransition = t < 6600 ? 0.6 : 0.92; targetWindSpeed = t < 6600 ? 14 : 26; weatherTimer = Math.max(weatherTimer, 400);
+                } else { weatherState = 1; targetWeatherTransition = 0.4; targetWindSpeed = 6; weatherTimer = Math.max(weatherTimer, 400); }
+                if (!eruptBlast && t >= 330) { // ledakan pertama
+                    eruptBlast = true;
+                    if (t < 700) { lightningFlash = 1; volGlow = 1; quakeT = 40; }
+                }
+                if (t >= 600 && t < 6200 && Math.random() < (0.004 * vPlume + 0.012 * ashRain) * dt) volcanoBolt();
+                if (t >= 9000) { eruptT = -1; weatherTimer = 900 + Math.random() * 600; }
+            }
+            const t = eruptT, w = (a, b) => on && t >= a && t < b ? 1 : 0, lp = (v, g, u, d) => { v += (g - v) * lerpK(g > v ? u : d); return v < 0.002 ? 0 : v; };
+            vMelt = lp(vMelt, on && t >= 150 ? 1 : 0, 0.05, 0.0008);   // salju: hilang mendadak, tumbuh lagi pelan setelah selesai
+            vLava = lp(vLava, w(200, 7200), 0.012, 0.004);
+            vPlume = lp(vPlume, w(330, 5800), 0.006, 0.006);
+            skyOrange = lp(skyOrange, w(800, 7600), 0.0016, 0.0012);   // bertahap ~10 dtk
+            skyBlack = lp(skyBlack, w(2000, 6600), 0.0018, 0.0012);    // oranye -> hitam pekat
+            ashRain = lp(ashRain, w(2800, 5800), 0.004, 0.004);
+            if (volGlow > 0) volGlow = Math.max(0, volGlow - 0.005 * dt);
+            ashCover = Math.min(1, Math.max(0, ashCover + ashRain * 0.0009 * dt - weatherTransition * 0.0012 * dt)); // hujan air mencuci abu
+            volHaze = Math.max(skyOrange * 0.6, ashRain, skyBlack * 0.6);
+            smokeK = Math.max(karhutla, volHaze);
+            let vt = 'Tenang', vc = 'rgba(255,255,255,0.6)';
+            if (on) {
+                if (t < 150) [vt, vc] = ['Tremor vulkanik', '#dd6'];
+                else if (t < 330) [vt, vc] = ['Salju mencair!', '#f93'];
+                else if (t < 800) [vt, vc] = ['MELETUS', '#f55'];
+                else if (t < 2000) [vt, vc] = ['Langit memerah', '#f74'];
+                else if (t < 2800) [vt, vc] = ['Langit gelap', '#c96'];
+                else if (t < 5600) [vt, vc] = ['HUJAN ABU', '#cba'];
+                else if (t < 8800) [vt, vc] = ['Hujan & angin', '#8bd'];
+                else [vt, vc] = ['Mereda', '#7d7'];
+            } else if (vMelt > 0.05 || skyOrange > 0.05 || ashCover > 0.05) [vt, vc] = ['Mereda', '#7d7'];
+            if (vt !== lastVolTxt) { volcanoTextEl.textContent = lastVolTxt = vt; volcanoTextEl.style.color = vc; }
+        }
+
         function triggerQuake() {
             if (quakeT < 0) quakeT = 0;
             else if (quakeT < 520) quakeT = 520; // pressed again: let it die away now
@@ -1003,6 +1094,15 @@
             nightAmt = Math.max(0, -sunHeight);
             duskAmt = Math.max(0, 1 - Math.abs(sunHeight) * 2.2); // spikes at sunrise/sunset
             darkEnough = nightAmt > 0.12;
+            { // v19: langit letusan (oranye -> hitam) menggeser siang menjadi "malam": lampu jalan, jendela, bintang/bulan/bayangan ikut logika malam
+                // lv = seberapa "gelap" langit letusan bagi lampu: menyalakan SEMUA jenis cahaya serempak (jendela gedung, rumah, lampu jalan, neon, reklame, pendar kota)
+                // dan membatalkan jadwal jam biologis (di pagi hari banyak jendela biasanya mati; saat langit hitam penghuni menyalakan lampu)
+                const lv = ss(0.05, 0.55, skyOrange);
+                if (lv > 0.003) {
+                    dayAmt *= 1 - lv; duskAmt *= 1 - lv; nightAmt = Math.max(nightAmt, lv * 0.9); darkEnough = nightAmt > 0.12;
+                    awakeHome += (1 - awakeHome) * lv; awakeOffice += (1 - awakeOffice) * lv;
+                }
+            }
 
             let phaseLabel = "Malam";
             if (dayTime >= 0.22 && dayTime < 0.45) phaseLabel = "Pagi";
@@ -1036,6 +1136,7 @@
             congestion += (targetCongestion - congestion) * lerpK(0.0025);
 
             // Seasons: musim hujan = the usual random weather; kemarau = a long dry spell with no rain at all
+            updateEruption();
             seasonElapsed += dt;
             if (seasonElapsed >= seasonLen) startSeason(1 - season);
             weatherTimer -= dt;
@@ -1091,6 +1192,7 @@
             if (weatherTransition > 0.01 && weatherTransition <= 0.3) weatherName = "Hujan lokal";
             else if (weatherTransition <= 0.3) { if (pollution > 0.7) weatherName = "Smog"; else if (pollution > 0.35) weatherName = "Hazy"; }
             if (karhutla > 0.25) weatherName = "KARHUTLA";
+            if (ashRain > 0.25) weatherName = "HUJAN ABU"; else if (skyOrange > 0.25 && weatherTransition < 0.5) weatherName = "ERUPSI GUNUNG";
             if (quake > 0.05) weatherName += " + GEMPA";
             if (weatherName !== lastWeather) {
                 weatherText.textContent = lastWeather = weatherName;
@@ -1100,7 +1202,7 @@
             if (wt !== lastWind) windText.textContent = lastWind = wt;
             const days = Math.ceil(seasonLen / DAY_FRAMES), sTxt = (season ? 'Kemarau' : 'Hujan') + ' · Hari ' + Math.min(days, Math.floor(seasonElapsed / DAY_FRAMES) + 1) + '/' + days;
             if (sTxt !== lastSeason) seasonText.textContent = lastSeason = sTxt;
-            const aqi = Math.min(1000, Math.round((30 + pollution * 260 + karhutla * 710) / 5) * 5); // up to ~1000 in a full karhutla haze
+            const aqi = Math.min(1000, Math.round((30 + pollution * 260 + karhutla * 710 + Math.max(ashRain, skyOrange * 0.5) * 760) / 5) * 5); // up to ~1000 in a full karhutla haze
             if (aqi !== lastAqi) {
                 lastAqi = aqi; const lv = aqi < 50 ? 0 : aqi < 100 ? 1 : aqi < 150 ? 2 : aqi < 200 ? 3 : aqi < 300 ? 4 : 5;
                 airText.textContent = aqi + ' · ' + ['Baik', 'Sedang', 'Sensitif', 'Tidak Sehat', 'Sangat Buruk', 'Berbahaya'][lv];
@@ -1152,6 +1254,8 @@
             if (quakeDust > 0) { quakeDust -= 0.00075 * dt; if (quakeDust < 0) quakeDust = 0; }
             if (quake > 0.6) { // the grid trips: lights stutter and mostly stay out while it shakes
                 powerOn = Math.random() < 0.02 * dt;
+            } else if (ashRain > 0.5) { // hujan abu + petir: jaringan listrik berkedip
+                powerOn = Math.sin(time * 1.7) * Math.sin(time * 0.53 + 2) > -0.35;
             } else if (weatherTransition < 0.55) {
                 powerOn = true;
             } else if (weatherTransition < 0.75) {
@@ -1176,8 +1280,9 @@
             else if (weatherTransition < 0.05 && pollution < 0.15) pollution += 0.00002 * dt;
             karhutla += ((karhutlaOn ? 1 : 0) - karhutla) * lerpK(karhutlaOn ? 0.0025 : 0.0012);
             if (!karhutlaOn && karhutla < 0.002) karhutla = 0;
+            if (ashRain > 0.05) pollution += ashRain * 0.0015 * dt; // abu vulkanik mengotori udara; hujan air kemudian mencucinya
             pollution = Math.min(1, Math.max(0, pollution));
-            updateAsh();
+            updateAsh(); updateVolAsh();
 
             // Update Clouds (drift lazily; wind only nudges them noticeably once weather actually turns)
             clouds.forEach(c => {
@@ -1250,13 +1355,13 @@
         function updateSun() {
             const prog = Math.min(1, Math.max(0, (dayTime - 0.25) / 0.5));
             SUN.x = prog * width; SUN.y = 165 - Math.sin(prog * Math.PI) * 140;
-            SUN.clear = Math.max(0, 1 - weatherTransition * 1.6) * (1 - karhutla * 0.85); // smoke swallows direct sunlight
+            SUN.clear = Math.max(0, 1 - weatherTransition * 1.6) * (1 - karhutla * 0.85) * (1 - Math.min(1, skyOrange * 1.7)); // cahaya matahari (sinar, bloom, bayangan) padam ditelan abu // smoke swallows direct sunlight
             const w = Math.pow(duskAmt, 0.8); // colour temperature: white at noon -> deep orange at the horizon
             SUN.col = [255, Math.round(248 - w * 95), Math.round(225 - w * 150)];
             SUN.mx = Math.min(1, Math.max(0, ((dayTime - 0.75 + 1) % 1) / 0.5)) * width;
             SUN.sf = ss(0, 0.34, sunHeight) * SUN.clear;                 // sunlight / shadow strength: slow fade in & out
             SUN.rf = ss(0, 0.16, sunHeight) * SUN.clear;                 // god rays & glints: appear as the disc clears the horizon
-            SUN.mf = ss(0.04, 0.4, -sunHeight) * Math.max(0, 1 - weatherTransition * 1.3); // moonlight
+            SUN.mf = ss(0.04, 0.4, -sunHeight) * Math.max(0, 1 - weatherTransition * 1.3) * (1 - skyOrange); // moonlight
             SUN.Ls = 0.35 + (1 - dayAmt) * 1.7;   // shadows: short at noon, very long at dawn/dusk
             SUN.Lm = 0.5 + (1 - nightAmt) * 1.2;
             FT.b = Math.min(1, dayAmt * 1.15) * (1 - weatherTransition * 0.55); FT.warm = duskAmt * SUN.clear; FT.rim = SUN.sf * (1 - weatherTransition);
@@ -1361,6 +1466,10 @@
                 top = mix(top, mix([36, 19, 15], [118, 60, 34], dmk), karhutla * 0.85);
                 bot = mix(bot, mix([82, 36, 24], [206, 98, 44], dmk), karhutla * 0.92);
             }
+            if (skyOrange > 0.01) { // v19: letusan — langit bertahap oranye membara, lalu hitam pekat dengan sisa bara di cakrawala
+                top = mix(top, mix([128, 46, 16], [5, 4, 6], skyBlack), skyOrange * 0.95);
+                bot = mix(bot, mix([255, 140, 42], [30, 15, 11], skyBlack), skyOrange * 0.95);
+            }
             top = top.map(v => Math.max(0, v - rDark));
             bot = bot.map(v => Math.max(0, v - rDark));
             hazeRGB = bot; // the far city fades into this colour
@@ -1376,7 +1485,7 @@
                 let prog = Math.min(1, Math.max(0, (dayTime - 0.25) / 0.5));
                 let sx = prog * width;
                 let sy = 165 - Math.sin(prog * Math.PI) * 140;
-                let sunAlpha = Math.min(1, dayAmt * 1.4) * Math.max(0, 1 - weatherTransition * 1.1) * (1 - pollution * 0.3) * (1 - karhutla * 0.4);
+                let sunAlpha = Math.min(1, dayAmt * 1.4) * Math.max(0, 1 - weatherTransition * 1.1) * (1 - pollution * 0.3) * (1 - karhutla * 0.4) * (1 - Math.min(1, skyOrange * 1.7));
                 if (sunAlpha > 0) {
                     let clearBoost = Math.max(0, 1 - weatherTransition * 2) * (1 - pollution * 0.55); // sun blazes brighter on a clear day
                     let warmth = Math.min(1, duskAmt + pollution * 0.5 + karhutla * 0.7); // a dim red-orange disc through the smoke // smog reddens the sun; more orange near sunrise/sunset
@@ -1400,7 +1509,7 @@
                 nprog = Math.min(1, Math.max(0, nprog));
                 let mx = nprog * width;
                 let my = 165 - Math.sin(nprog * Math.PI) * 140;
-                let moonAlpha = Math.min(1, nightAmt * 1.3) * Math.max(0, 1 - weatherTransition * 1.1) * (1 - pollution * 0.25) * (1 - karhutla * 0.45);
+                let moonAlpha = Math.min(1, nightAmt * 1.3) * Math.max(0, 1 - weatherTransition * 1.1) * (1 - pollution * 0.25) * (1 - karhutla * 0.45) * (1 - skyOrange);
                 if (moonAlpha > 0) {
                     let moonGlow = ctx.createRadialGradient(mx, my, 2, mx, my, 40);
                     moonGlow.addColorStop(0, `rgba(210, 220, 230, ${moonAlpha * 0.5})`);
@@ -1435,7 +1544,7 @@
                 ctx.fillRect(0, 0, width, height);
             }
 
-            let starVisibility = nightAmt * Math.max(0, 1 - weatherTransition * 2.0) * (1 - pollution * 0.85) * (1 - karhutla * 0.92); // smoke hides the stars
+            let starVisibility = nightAmt * Math.max(0, 1 - weatherTransition * 2.0) * (1 - pollution * 0.85) * (1 - karhutla * 0.92) * (1 - skyOrange); // smoke hides the stars
             ctx.fillStyle = '#fff';
             if (starVisibility > 0.01) for (let si = 0; si < stars.length; si++) {
                 const st = stars[si];
@@ -1445,12 +1554,12 @@
             ctx.globalAlpha = 1.0;
 
             ctx.fillStyle = `rgb(${40 - rDark}, ${45 - rDark}, ${55 - rDark})`;
-            let stormGrow = 1 + weatherTransition * 1.8;
-            let cloudDarken = Math.floor(Math.pow(weatherTransition, 1.4) * 34);
+            let stormGrow = 1 + weatherTransition * 1.8 + skyOrange * 1.1;
+            let cloudDarken = Math.floor(Math.pow(weatherTransition, 1.4) * 34 + skyOrange * 26);
             let cloudDark = Math.max(0, 32 - cloudDarken + dayAmt * 50);
             const cSp = cloudSprite(0, Math.round(cloudDark));
             for (let ci = 0; ci < clouds.length; ci++) {
-                const c = clouds[ci], baseAlpha = Math.min(1, weatherTransition * 1.15 + c.opacity * 0.08);
+                const c = clouds[ci], baseAlpha = Math.min(1, weatherTransition * 1.15 + c.opacity * 0.08 + skyOrange * 0.9);
                 if (baseAlpha < 0.01) continue;
                 const cy2 = c.y + weatherTransition * 25, pf = c.puffs; ctx.globalAlpha = baseAlpha;
                 for (let pi = 0; pi < pf.length; pi++) {
@@ -1476,7 +1585,7 @@
             }
             ctx.globalAlpha = 1.0;
 
-            V15.drawFuji();
+            V15.drawFuji(); V15.drawPlume();
 
             // Distant Hills — dark silhouette at night, muted blue-grey in daylight
             let hillColor = mix([5, 7, 10], [55, 75, 95], dayAmt * 0.7);
@@ -1667,7 +1776,7 @@
             // Aerial perspective: 30 km of air washes the skyline out toward the horizon colour — thicker low
             // down where the sight line is longest, and much thicker in rain, when the far city all but vanishes.
             const [hr, hg, hb] = hazeRGB;
-            const hz = 0.42 + weatherTransition * 0.4 + pollution * 0.3 + karhutla * 0.22; // smog washes the far skyline out
+            const hz = 0.42 + weatherTransition * 0.4 + pollution * 0.3 + smokeK * 0.22; // smog washes the far skyline out
             const hazeGrad = ctx.createLinearGradient(0, base - 130, 0, base);
             hazeGrad.addColorStop(0, `rgba(${hr}, ${hg}, ${hb}, 0)`);
             hazeGrad.addColorStop(0.45, `rgba(${hr}, ${hg}, ${hb}, ${hz * 0.5})`);
@@ -1716,7 +1825,7 @@
             {
                 const B = V15.blind();
                 if (B > 0.02) {
-                    const dm = Math.min(1, dayAmt * 1.4 + duskAmt * 0.5), kk = karhutla / (karhutla + ss(0.5, 1, weatherTransition) + bigStorm + 0.001);
+                    const dm = Math.min(1, dayAmt * 1.4 + duskAmt * 0.5), kk = smokeK / (smokeK + ss(0.5, 1, weatherTransition) + bigStorm + 0.001);
                     const vr = ((1 - kk) * (34 + 92 * dm) + kk * (84 + 112 * dm)) | 0, vg2 = ((1 - kk) * (42 + 100 * dm) + kk * (40 + 70 * dm)) | 0, vb = ((1 - kk) * (56 + 104 * dm) + kk * (26 + 28 * dm)) | 0;
                     if (!veilC) { veilC = document.createElement('canvas'); veilC.width = 1; veilC.height = 64; }
                     const vg = veilC.getContext('2d'); vg.clearRect(0, 0, 1, 64);
@@ -1762,8 +1871,8 @@
             const bodyHOf = b => b.bodyHeight !== undefined ? b.bodyHeight : b.height;
             // v18: jarak pandang. hazeA = kepekatan kabut pada ketinggian y (sama dengan gradien di drawCity); blind = 0..1 badai / karhutla;
             // fadeOf = seberapa jauh sebuah gedung ditelan asap/hujan (tiap gedung punya ambang sendiri, jadi hanya sebagian yang hilang)
-            const hazeA = y => { const h = 0.42 + weatherTransition * 0.4 + pollution * 0.3 + karhutla * 0.22, t = c01((y - (HORIZON_Y + 2 - 130)) / 130); return t < 0.45 ? h * 0.5 * t / 0.45 : h * 0.5 + (Math.min(0.95, h * 1.5) - h * 0.5) * (t - 0.45) / 0.55; };
-            const blind = () => Math.max(ss(0.5, 1, weatherTransition) * 0.85, bigStorm * 0.9, karhutla);
+            const hazeA = y => { const h = 0.42 + weatherTransition * 0.4 + pollution * 0.3 + smokeK * 0.22, t = c01((y - (HORIZON_Y + 2 - 130)) / 130); return t < 0.45 ? h * 0.5 * t / 0.45 : h * 0.5 + (Math.min(0.95, h * 1.5) - h * 0.5) * (t - 0.45) / 0.55; };
+            const blind = () => Math.max(ss(0.5, 1, weatherTransition) * 0.85, bigStorm * 0.9, smokeK);
             function fadeOf(b) { if (b.th === undefined) b.th = (Math.abs(Math.sin(b.x * 12.9898 + b.width * 78.233) * 43758.5453) % 1) * (b.layer === 0 ? 0.6 : 1); const B = blind(); return B < 0.02 ? 0 : ss(b.th, b.th + 0.5, B) * 0.97; }
 
             // ---------- swayed position (same maths as swayBlit) so overlays follow the buildings in storms / quakes ----------
@@ -1780,7 +1889,7 @@
 
             // ---------- Gunung Fuji ----------
             const FJ = { cx: 470, hw: 120, H: 62, k: 62 / 140 }; // ~60 km: kira-kira separuh ukuran versi 30 km, jauh lebih berkabut
-            let fjBody, fjSnow, fjShade, fjTop;
+            let fjBody, fjSnow, fjShade, fjTop, fjLava = [];
             function buildFuji() {
                 const base = HORIZON_Y + 6, { cx, hw, H } = FJ; fjTop = base - H;
                 const K = FJ.k, prof = x => { const u = Math.abs(x - cx) / hw, v = Math.max(0, (u - 0.035) / 0.965); return base - H * Math.pow(1 - Math.min(1, v), 1.55) + (u < 0.035 ? 1.4 * K * Math.cos(u / 0.035 * 1.57) : 0) + K * (0.2 + u) * (1.1 * Math.sin(x * 0.21) + 0.7 * Math.sin(x * 0.53 + 2)); };
@@ -1790,6 +1899,13 @@
                 for (let x = cx - hw; x <= cx + hw; x += 2) { fjBody.lineTo(x, prof(x)); fjSnow.lineTo(x, sl(x)); }
                 fjBody.lineTo(cx + hw, base + 30); fjBody.closePath(); fjSnow.lineTo(cx + hw, fjTop - 6); fjSnow.closePath();
                 [1, -1].forEach((s, i) => { const P = fjShade[i]; P.moveTo(cx, fjTop - 2); for (let x = cx; s > 0 ? x <= cx + hw : x >= cx - hw; x += 2 * s) P.lineTo(x, prof(x)); P.lineTo(cx + s * hw, base + 30); P.lineTo(cx - s * hw * 0.2, base + 30); P.closePath(); });
+                // v19: aliran lava menuruni lereng dari kawah
+                fjLava = [];
+                for (let i = 0; i < 7; i++) {
+                    const s = i % 2 ? 1 : -1, x0 = cx + s * (2 + (i >> 1) * 3), len = hw * (0.3 + ((i * 37) % 10) / 10 * 0.55), pts = [];
+                    for (let x = x0; Math.abs(x - cx) <= len; x += s * 2) pts.push([x, prof(x) + 1.5 + Math.abs(x - cx) * 0.02 + Math.sin(x * 0.9 + i) * 0.8]);
+                    fjLava.push(pts);
+                }
             }
             function drawFuji() {
                 if (!fjBody) buildFuji();
@@ -1798,19 +1914,71 @@
                 const body = bl(mixc(mixc([12, 16, 30], [84, 108, 156], day), [110, 66, 112], duskAmt * 0.75), hz);
                 const snow = bl(mixc(mixc([98, 112, 146], [240, 245, 252], day), [255, 196, 176], duskAmt * 0.8), hz * 0.75);
                 ctx.save(); ctx.fillStyle = rgbs(body); ctx.fill(fjBody); ctx.clip(fjBody);
-                ctx.fillStyle = rgbs(snow); ctx.fill(fjSnow);
+                ctx.fillStyle = rgbs(mixc(snow, bl(mixc([20, 14, 16], [78, 60, 58], day), hz * 0.8), vMelt)); ctx.fill(fjSnow); // salju hilang -> batuan gosong
                 ctx.fillStyle = `rgba(14,22,60,${(0.3 * (1 - hz * 0.8)).toFixed(3)})`; ctx.fill(fjShade[(nightAmt > dayAmt ? SUN.mx : SUN.x) < FJ.cx ? 0 : 1]);
                 const g = ctx.createLinearGradient(0, fjTop + 40 * FJ.k, 0, HORIZON_Y + 6);
                 g.addColorStop(0, `rgba(${hr | 0},${hg | 0},${hb | 0},0)`); g.addColorStop(1, `rgba(${hr | 0},${hg | 0},${hb | 0},0.8)`);
                 ctx.fillStyle = g; ctx.fillRect(FJ.cx - FJ.hw, fjTop + 40 * FJ.k, FJ.hw * 2, HORIZON_Y - fjTop);
+                if (vLava > 0.02) { // lava menyala, memanjang menuruni lereng
+                    const fl = 0.78 + 0.22 * Math.sin(time * 0.13);
+                    [[2.6, `rgba(255,70,20,${(0.3 * vLava * fl).toFixed(3)})`], [1, `rgba(255,${(150 + 60 * fl) | 0},50,${(0.95 * vLava).toFixed(3)})`]].forEach(([lw, col]) => {
+                        ctx.lineWidth = lw; ctx.strokeStyle = col; ctx.beginPath();
+                        fjLava.forEach(pts => { const n = Math.ceil(pts.length * vLava); ctx.moveTo(pts[0][0], pts[0][1]); for (let j = 1; j < n; j++) ctx.lineTo(pts[j][0], pts[j][1]); });
+                        ctx.stroke();
+                    });
+                }
                 ctx.restore();
                 // lenticular cloud "hat" drifting around the summit
                 ctx.fillStyle = rgbs(mixc(mixc([120, 132, 170], [252, 252, 255], day), [255, 200, 170], duskAmt * 0.7));
-                ctx.globalAlpha = (0.16 + 0.2 * Math.max(day, duskAmt)) * (1 - wt * 0.6);
+                ctx.globalAlpha = (0.16 + 0.2 * Math.max(day, duskAmt)) * (1 - wt * 0.6) * (1 - c01(vMelt * 1.2 + vPlume));
                 const cx2 = FJ.cx + Math.sin(time * 0.0006) * 14, fk = FJ.k;
                 for (let r = -2; r <= 2; r++) { const w = 44 * fk * Math.sqrt(1 - (r / 2.8) ** 2); ctx.fillRect(Math.round(cx2 - w), fjTop + 11 + r, Math.round(w * 2), 1); }
                 for (let r = -1; r <= 1; r++) { const w = 30 * fk * Math.sqrt(1 - (r / 1.8) ** 2); ctx.fillRect(Math.round(cx2 - w + 4), fjTop + 14 + r, Math.round(w * 2), 1); }
                 ctx.globalAlpha = 1;
+            }
+
+            // ---------- v19: kolom asap erupsi, payung abu di langit & cahaya kawah ----------
+            const PL = [], plumeSp = []; let plAcc = 0, capAcc = 0;
+            const plumeSprite = l => plumeSp[l] || (plumeSp[l] = makeSprite(64, (g, S) => {
+                const h = S / 2, k = l / 7, r = (20 + 112 * k) | 0, gg = (17 + 98 * k) | 0, b = (19 + 90 * k) | 0;
+                const gr = g.createRadialGradient(h * 0.9, h * 0.85, 2, h, h, h);
+                gr.addColorStop(0, `rgba(${r + 18},${gg + 12},${b + 10},1)`); gr.addColorStop(0.55, `rgba(${r},${gg},${b},0.85)`); gr.addColorStop(1, `rgba(${r},${gg},${b},0)`);
+                g.fillStyle = gr; g.fillRect(0, 0, S, S);
+            }));
+            const craterY = () => HORIZON_Y + 6 - FJ.H + 2;
+            function updateVolcano() {
+                const cx = FJ.cx, cy = craterY();
+                if (vPlume > 0.02) {
+                    plAcc += vPlume * 0.5 * dt; while (plAcc >= 1) { plAcc -= 1; PL.push({ x: cx + rnd(-3, 3), y: cy, vx: rnd(-0.12, 0.12), vy: -rnd(1.0, 1.5), r: rnd(3, 5), age: 0, life: rnd(380, 560), l: (Math.random() * 3) | 0, cap: false, ph: rnd(0, 6.28) }); }
+                    capAcc += vPlume * 0.05 * dt; while (capAcc >= 1) { capAcc -= 1; const s = Math.random() < 0.5 ? -1 : 1; PL.push({ x: cx + rnd(-16, 16), y: rnd(26, 56), vx: s * rnd(0.12, 0.34), vy: rnd(-0.02, 0.03), r: rnd(16, 28), age: 0, life: rnd(1100, 1500), l: (Math.random() * 3) | 0, cap: true, ph: 0 }); }
+                    while (PL.length > 460) PL.shift();
+                }
+                const w = Math.min(windSpeed, 34) * 0.014;
+                for (let i = PL.length - 1; i >= 0; i--) {
+                    const p = PL[i]; p.age += dt;
+                    if (p.age >= p.life) { PL.splice(i, 1); continue; }
+                    if (p.cap) { p.x += (p.vx + w) * dt; p.y += p.vy * dt; p.r = Math.min(44, p.r + 0.02 * dt); }
+                    else {
+                        p.vy *= Math.pow(0.992, dt); const rise = c01((cy - p.y) / 150);
+                        if (rise > 0.7) p.vx += (p.x >= cx ? 1 : -1) * 0.004 * dt; // di puncak kolom asap melebar
+                        p.x += (p.vx + Math.sin(time * 0.05 + p.ph) * 0.08 + w * (0.3 + rise * 1.2)) * dt; p.y += p.vy * dt; p.r = Math.min(30, p.r + 0.05 * dt);
+                    }
+                }
+            }
+            function drawPlume() {
+                if (!PL.length && vLava < 0.02 && volGlow < 0.02) return;
+                const dm = c01(dayAmt * 1.3 + duskAmt * 0.4), cx = FJ.cx, cy = craterY();
+                ctx.save();
+                for (let i = 0; i < PL.length; i++) {
+                    const p = PL[i], k = p.age / p.life, a = Math.min(1, p.age / 40) * (k > 0.6 ? (1 - k) / 0.4 : 1) * (p.cap ? 0.75 : 0.88), r = p.r;
+                    ctx.globalAlpha = a; ctx.drawImage(plumeSprite(Math.min(7, p.l + ((dm * 4) | 0))), p.x - r, p.y - r * 0.85, r * 2, r * 1.7);
+                }
+                ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'lighter';
+                for (let i = 0; i < PL.length; i++) { const p = PL[i]; if (!p.cap && p.age < 140) drawGlow(p.x, p.y, p.r * 1.6, (1 - p.age / 140) * 0.3 * vLava, '255,110,30'); } // bagian bawah kolom menyala oleh lava
+                const fl = 0.85 + 0.15 * Math.sin(time * 0.17) * Math.sin(time * 0.05);
+                drawGlow(cx, cy, 26 + 16 * vLava, Math.min(1, 0.6 * vLava * fl + volGlow * 0.7), '255,135,45');
+                drawGlow(cx, cy, 80 + 40 * volGlow, 0.16 * vLava + volGlow * 0.5, '255,90,20', 0.75);
+                ctx.restore();
             }
 
             // ---------- Pesawat dari segala arah, sebagian berasap ----------
@@ -1847,7 +2015,7 @@
             }
             function updatePlanes() {
                 planeTimer -= dt;
-                if (planeTimer <= 0) { if (planes.filter(p => !p.dead).length < 4 && weatherTransition < 0.5) spawnPlane(false); planeTimer = rnd(260, 520); }
+                if (planeTimer <= 0) { if (planes.filter(p => !p.dead).length < 4 && weatherTransition < 0.5 && volHaze < 0.3) spawnPlane(false); planeTimer = rnd(260, 520); }
                 for (let i = planes.length - 1; i >= 0; i--) {
                     const p = planes[i]; p.age += dt;
                     if (!p.dead) {
@@ -1996,7 +2164,7 @@
                     ctx.globalCompositeOperation = 'source-over';
                 }
                 if (on > 0.05) { // lampu sorot yang menyapu langit
-                    ctx.globalCompositeOperation = 'lighter'; const k = on * dimK * (1 + pollution * 1.2) * (1 - 0.8 * blind());
+                    ctx.globalCompositeOperation = 'lighter'; const k = on * dimK * (1 + pollution * 1.2) * (1 - 0.8 * blind()) * (1 - 0.8 * volHaze); // v19: sorotan tertelan asap vulkanik
                     lights.forEach(s => {
                         const a = -Math.PI / 2 + 0.75 * Math.sin(time * s.sp * 60 / 60 + s.ph), L = 230, hw = 0.05, ox = s.x + swayDX(s.x, s.y), oy = s.y, g = ctx.createLinearGradient(ox, oy, ox + Math.cos(a) * L, oy + Math.sin(a) * L);
                         g.addColorStop(0, `rgba(${s.rgb},${(0.2 * k).toFixed(3)})`); g.addColorStop(1, `rgba(${s.rgb},0)`); ctx.fillStyle = g;
@@ -2022,7 +2190,7 @@
                     if (a > 0.2) { ctx.globalCompositeOperation = 'lighter'; drawGlow(x + 0.5, y - 0.5, 5, 0.6 * a * dk, '255,40,30'); drawGlow(x + 0.5, y - 0.5, 12, 0.16 * a * dk * nk, '255,30,20'); ctx.globalCompositeOperation = 'source-over'; }
                 });
             }
-            return { fadeOf, swayDX, blind, init, updatePlanes, drawPlanes, drawFuji, drawCityAmbience, spawn: () => spawnPlane(false), seed: () => { for (let i = 0; i < 3; i++) spawnPlane(true); } };
+            return { FJ, craterY, updateVolcano, drawPlume, fadeOf, swayDX, blind, init, updatePlanes, drawPlanes, drawFuji, drawCityAmbience, spawn: () => spawnPlane(false), seed: () => { for (let i = 0; i < 3; i++) spawnPlane(true); } };
         })();
         window.addEventListener('keydown', e => { if (e.key.toLowerCase() === 'p') V15.spawn(); });
 
@@ -2556,7 +2724,7 @@
         function drawRainFront() {
             const wt = weatherTransition;
             drawFog(wt); // dynamic rain / storm fog + smog, full frame
-            drawAsh();
+            drawAsh(); drawVolAsh();
             if (wt < 0.004) return;
             drawRainLayer(2, wt);
         } // near rain: in front of everything
@@ -2636,7 +2804,7 @@
         function drawFog(wt) {
             const storm = ss(0.5, 1, wt), dm = Math.min(1, dayAmt * 1.4 + duskAmt * 0.5);
             const rainAmt = (ss(0.02, 0.5, wt) * 0.5 + storm * 0.16) * (0.9 + 0.1 * Math.sin(time * 0.0045));
-            const smogAmt = Math.max(pollution > 0.03 ? pollution * 0.5 : 0, quakeDust * 0.42, karhutla * 0.8) * (1 - Math.min(1, wt * 1.3)) * (0.92 + 0.08 * Math.sin(time * 0.0028)); // smog, or dust thrown up by a quake
+            const smogAmt = Math.max(pollution > 0.03 ? pollution * 0.5 : 0, quakeDust * 0.42, smokeK * 0.8) * (1 - Math.min(1, wt * 1.3)) * (0.92 + 0.08 * Math.sin(time * 0.0028)); // smog, or dust thrown up by a quake
             const wnd = Math.min(38, Math.abs(windSpeed));
             const flashing = lightningFlash > 0.02;
             if (rainAmt > 0.012) {
@@ -2654,7 +2822,7 @@
                 for (let i = 0; i < F.layers.length; i++) F.off[i] += (0.05 + wnd * 0.03) * F.layers[i].sp * dt;
                 if ((F.n -= dt) <= 0) {
                     F.n = 3;
-                    const kk = karhutla; // smoke turns orange-red as the fires take over
+                    const kk = smokeK; // smoke turns orange-red as the fires take over
                     renderFog(F, `rgb(${((84 + 112 * dm) * (1 - kk) + (82 + 118 * dm) * kk) | 0}, ${((70 + 98 * dm) * (1 - kk) + (34 + 66 * dm) * kk) | 0}, ${((60 + 60 * dm) * (1 - kk) + (22 + 24 * dm) * kk) | 0})`, null);
                 }
                 ctx.globalAlpha = smogAmt; ctx.drawImage(F.c, 0, 0, FOG_W, FOG_H, 0, 0, width, height); ctx.globalAlpha = 1;
@@ -2666,13 +2834,13 @@
             { s: 1.5, sy: 0.7, sp: 1.0, a: 0.9, oy: 20, bob: 0.008, amp: 4, br: 0.005 },
             { s: 2.4, sy: 0.9, sp: 0.6, a: 0.8, oy: 70, bob: 0.005, amp: 6, br: 0.003 }]);
         function drawCityClouds() {
-            const wt = weatherTransition, amt = Math.max(ss(0.4, 0.95, wt) * 0.95, bigStorm, karhutla * 0.85);
+            const wt = weatherTransition, amt = Math.max(ss(0.4, 0.95, wt) * 0.95, bigStorm, smokeK * 0.85);
             if (amt < 0.03) return;
             const F = fogCap, wnd = Math.min(38, Math.abs(windSpeed)), flashing = lightningFlash > 0.02, dm = Math.min(1, dayAmt * 1.4 + duskAmt * 0.5);
             for (let i = 0; i < F.layers.length; i++) F.off[i] += (0.06 + wnd * 0.05) * F.layers[i].sp * dt;
             if ((F.n -= dt) <= 0 || flashing) {
                 F.n = 2;
-                const kk = karhutla / (karhutla + ss(0.4, 0.95, wt) + bigStorm + 0.001), fl = flashing ? Math.min(1, lightningFlash) * 140 : 0;
+                const kk = smokeK / (smokeK + ss(0.4, 0.95, wt) + bigStorm + 0.001), fl = flashing ? Math.min(1, lightningFlash) * 140 : 0;
                 renderFog(F, `rgb(${Math.min(255, (1 - kk) * (30 + 84 * dm) + kk * (84 + 112 * dm) + fl) | 0}, ${Math.min(255, (1 - kk) * (38 + 92 * dm) + kk * (40 + 70 * dm) + fl) | 0}, ${Math.min(255, (1 - kk) * (52 + 98 * dm) + kk * (26 + 28 * dm) + fl) | 0})`, null);
             }
             ctx.globalAlpha = Math.min(1, amt * 1.05); ctx.drawImage(F.c, 0, 0, FOG_W, FOG_H, 0, 0, width, height); ctx.globalAlpha = 1;
@@ -2746,6 +2914,12 @@
                 ctx.fillStyle = `rgba(${(46 + 106 * dmk) | 0}, ${(20 + 50 * dmk) | 0}, ${(12 + 14 * dmk) | 0}, ${karhutla * (0.16 + 0.1 * dmk)})`;
                 ctx.fillRect(0, 0, width, height);
             }
+            if (skyOrange > 0.02) { // v19: cahaya letusan meredupkan seluruh pemandangan (oranye membara -> gelap)
+                const q = skyBlack;
+                ctx.fillStyle = `rgba(${(70 - 55 * q) | 0}, ${(28 - 22 * q) | 0}, ${(10 - 7 * q) | 0}, ${skyOrange * (0.16 + 0.2 * q)})`;
+                ctx.fillRect(0, 0, width, height);
+            }
+            if (ashCover > 0.02) { ctx.fillStyle = `rgba(150, 146, 142, ${ashCover * 0.10})`; ctx.fillRect(0, HORIZON_Y, width, height - HORIZON_Y); } // lapisan abu di tanah, atap & jalan
             // Smog veil over the whole scene (the horizon band is drawn separately, behind the road)
             if (pollution > 0.03) {
                 const dm = Math.min(1, dayAmt * 1.5 + duskAmt * 0.6);
@@ -2858,6 +3032,7 @@
             lastT = now;
             updatePhysics();
             V15.updatePlanes();
+            V15.updateVolcano();
 
             drawSkyAndHills();
             drawLightningBolt();
@@ -2883,7 +3058,7 @@
             frameMs += (performance.now() - t0 - frameMs) * 0.1;
             if ((govTick++ % 15) === 0) govern();
         }
-        window.addEventListener('keydown', e => { const k = e.key.toLowerCase(); if (k === 'k') seasonKey(1); else if (k === 'h') seasonKey(0); else if (k === 'b') toggleBigStorm(); else if (k === 'g') triggerQuake(); else if (k === 'f') toggleKarhutla(); });
+        window.addEventListener('keydown', e => { const k = e.key.toLowerCase(); if (k === 'k') seasonKey(1); else if (k === 'h') seasonKey(0); else if (k === 'b') toggleBigStorm(); else if (k === 'g') triggerQuake(); else if (k === 'f') toggleKarhutla(); else if (k === 'v') toggleVolcano(); });
         document.addEventListener('visibilitychange', () => { lastT = 0; dtN = 0; dtRing.fill(0); });
 
         // Initialize and start
